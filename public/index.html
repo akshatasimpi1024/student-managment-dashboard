@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="studentApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Admin Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body ng-controller="MainController" ng-class="{'dark-mode': darkMode}">
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-white border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 primary-text fs-4 fw-bold text-uppercase border-bottom">
+                <i class="bi bi-mortarboard-fill me-2"></i>EduAdmin
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold" ng-class="{'active': activeTab === 'home'}" ng-click="setTab('home')">
+                    <i class="bi bi-house-door me-2"></i>Home
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold" ng-class="{'active': activeTab === 'dashboard'}" ng-click="setTab('dashboard')">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold" ng-class="{'active': activeTab === 'students'}" ng-click="setTab('students')">
+                    <i class="bi bi-people me-2"></i>Students
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold" ng-click="openAddModal()">
+                    <i class="bi bi-person-plus me-2"></i>Add Student
+                </a>
+                <div class="mt-auto p-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-switch" type="checkbox" id="darkModeSwitch" ng-model="darkMode">
+                        <label class="form-check-label ms-2" for="darkModeSwitch">
+                            <i class="bi" ng-class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill'"></i>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-list fs-4 me-3" id="menu-toggle"></i>
+                    <h2 class="fs-2 m-0">{{activeTab === 'home' ? 'Home' : (activeTab === 'dashboard' ? 'Dashboard' : 'Student Management')}}</h2>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4">
+                <!-- Home Tab -->
+                <div ng-show="activeTab === 'home'">
+                    <div class="hero-section px-5">
+                        <div class="row align-items-center">
+                            <div class="col-lg-7 hero-content">
+                                <h1 class="display-4 fw-bold mb-4">Empowering Education with Smart Management</h1>
+                                <p class="lead mb-5">Streamline your academic administration with our comprehensive student management dashboard. Manage records, track performance, and gain insights with ease.</p>
+                                <div class="d-flex gap-3">
+                                    <button class="btn btn-light btn-lg px-4 fw-bold" ng-click="setTab('dashboard')">Get Started</button>
+                                    <button class="btn btn-light-outline btn-lg px-4 fw-bold" ng-click="setTab('students')">View Students</button>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 d-none d-lg-block">
+                                <img src="https://picsum.photos/seed/education/600/400" alt="Hero Image" class="hero-img rounded-4">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <div class="feature-card text-center">
+                                <div class="mb-4">
+                                    <i class="bi bi-lightning-charge-fill fs-1 primary-text"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Real-time Analytics</h4>
+                                <p class="text-muted">Get instant insights into student distribution and academic progress with dynamic charts and stats.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card text-center">
+                                <div class="mb-4">
+                                    <i class="bi bi-shield-check fs-1 primary-text"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Secure Management</h4>
+                                <p class="text-muted">Maintain accurate and secure student records with easy-to-use CRUD operations and data validation.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card text-center">
+                                <div class="mb-4">
+                                    <i class="bi bi-moon-stars-fill fs-1 primary-text"></i>
+                                </div>
+                                <h4 class="fw-bold mb-3">Modern Experience</h4>
+                                <p class="text-muted">Enjoy a seamless user experience with dark mode support, responsive design, and intuitive navigation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div ng-show="activeTab === 'dashboard'">
+                    <div class="row g-3 my-2">
+                        <div class="col-md-3">
+                            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded card-stat">
+                                <div>
+                                    <h3 class="fs-2">{{stats.totalStudents}}</h3>
+                                    <p class="fs-5">Total Students</p>
+                                </div>
+                                <i class="bi bi-people fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded card-stat">
+                                <div>
+                                    <h3 class="fs-2">{{stats.totalBranches}}</h3>
+                                    <p class="fs-5">Branches</p>
+                                </div>
+                                <i class="bi bi-diagram-3 fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded card-stat">
+                                <div>
+                                    <h3 class="fs-2">{{stats.avgSemester | number:1}}</h3>
+                                    <p class="fs-5">Avg Semester</p>
+                                </div>
+                                <i class="bi bi-calendar-check fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded card-stat">
+                                <div>
+                                    <h3 class="fs-2">{{stats.maxSemester}}</h3>
+                                    <p class="fs-5">Highest Sem</p>
+                                </div>
+                                <i class="bi bi-arrow-up-circle fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-5">
+                        <div class="col-md-8">
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <h3 class="fs-4 mb-3">Students per Branch</h3>
+                                <canvas id="branchChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <h3 class="fs-4 mb-3">Quick Actions</h3>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary py-3" ng-click="openAddModal()">
+                                        <i class="bi bi-person-plus me-2"></i>Add New Student
+                                    </button>
+                                    <button class="btn btn-success py-3" ng-click="exportCSV()">
+                                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Export to CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Tab -->
+                <div ng-show="activeTab === 'students'">
+                    <div class="row my-4">
+                        <div class="col-md-12">
+                            <div class="bg-white p-4 rounded shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="fs-4">Student Records</h3>
+                                    <div class="d-flex gap-2">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control border-start-0" placeholder="Search name or USN..." ng-model="searchQuery">
+                                        </div>
+                                        <select class="form-select" ng-model="branchFilter" style="width: 200px;">
+                                            <option value="">All Branches</option>
+                                            <option ng-repeat="branch in branches" value="{{branch}}">{{branch}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Name</th>
+                                                <th>USN</th>
+                                                <th>Branch</th>
+                                                <th>Semester</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="student in students | filter:searchQuery | filter:{branch: branchFilter}">
+                                                <td>{{$index + 1}}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar me-2">
+                                                            <img ng-if="student.photo" ng-src="{{student.photo}}" alt="{{student.name}}">
+                                                            <span ng-if="!student.photo">{{student.name.charAt(0)}}</span>
+                                                        </div>
+                                                        <span class="fw-bold">{{student.name}}</span>
+                                                    </div>
+                                                </td>
+                                                <td><code>{{student.usn}}</code></td>
+                                                <td>
+                                                    <span class="badge" ng-class="getBranchBadgeClass(student.branch)">{{student.branch}}</span>
+                                                </td>
+                                                <td>Sem {{student.semester}}</td>
+                                                <td class="text-end">
+                                                    <button class="btn btn-sm btn-outline-primary me-1" ng-click="openEditModal(student)">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" ng-click="deleteStudent(student)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr ng-if="(students | filter:searchQuery | filter:{branch: branchFilter}).length === 0">
+                                                <td colspan="6" class="text-center py-5 text-muted">No students found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+
+    <!-- Student Modal -->
+    <div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">{{isEditing ? 'Edit Student Details' : 'Add New Student'}}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form name="studentForm" ng-submit="saveStudent()" novalidate>
+                    <div class="modal-body p-4">
+                        <!-- Photo Upload Section -->
+                        <div class="text-center mb-4">
+                            <div class="photo-preview-container">
+                                <img ng-if="currentStudent.photo" ng-src="{{currentStudent.photo}}" alt="Preview">
+                                <i ng-if="!currentStudent.photo" class="bi bi-person-fill"></i>
+                                <label for="photoInput" class="photo-upload-btn">
+                                    <i class="bi bi-camera-fill" style="font-size: 1rem; color: white;"></i>
+                                </label>
+                            </div>
+                            <input type="file" id="photoInput" class="d-none" accept="image/*" onchange="angular.element(this).scope().handlePhotoUpload(this)">
+                            <p class="small text-muted">Click the camera icon to upload a photo</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Full Name</label>
+                            <input type="text" class="form-control" ng-model="currentStudent.name" required name="name" placeholder="Enter student name">
+                            <div class="text-danger small" ng-show="studentForm.name.$touched && studentForm.name.$invalid">Name is required.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">USN</label>
+                            <input type="text" class="form-control" ng-model="currentStudent.usn" required name="usn" placeholder="e.g. 1RV20CS001">
+                            <div class="text-danger small" ng-show="studentForm.usn.$touched && studentForm.usn.$invalid">USN is required.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Branch</label>
+                                <select class="form-select" ng-model="currentStudent.branch" required name="branch">
+                                    <option value="">Select Branch</option>
+                                    <option ng-repeat="branch in branches" value="{{branch}}">{{branch}}</option>
+                                </select>
+                                <div class="text-danger small" ng-show="studentForm.branch.$touched && studentForm.branch.$invalid">Branch is required.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Semester</label>
+                                <select class="form-select" ng-model="currentStudent.semester" required name="semester">
+                                    <option value="">Select Sem</option>
+                                    <option ng-repeat="sem in semesters" value="{{sem}}">Semester {{sem}}</option>
+                                </select>
+                                <div class="text-danger small" ng-show="studentForm.semester.$touched && studentForm.semester.$invalid">Semester is required.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4" ng-disabled="studentForm.$invalid">
+                            {{isEditing ? 'Update Records' : 'Save Student'}}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle-fill me-2"></i>{{toastMessage}}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
